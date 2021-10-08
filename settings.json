@@ -1,0 +1,25 @@
+{
+  "SettingsVersion": 1.2,
+  "SimMode": "ComputerVision",
+  "CameraDefaults": {
+    "CaptureSettings": [
+      {
+        "Width": 2048,
+        "Height": 1024
+      }
+    ]
+  },
+  "ExternalCameras": {
+    "AerialCamera": {
+      "X": 0.0,
+      "Y": 0.0,
+      "Z": 0.0,
+      "CaptureSettings": [
+        {
+          "Width": 2048,
+          "Height": 1024
+        }
+      ]
+    }
+  }
+}
