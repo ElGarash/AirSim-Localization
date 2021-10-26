@@ -2,8 +2,8 @@ import math
 import airsim
 import os
 import tempfile
+import time
 
-AERIAL_PITCH_ANGLE = -40
 # Connect to AirSim and confirm connection.
 client = airsim.VehicleClient()
 client.confirmConnection()
@@ -41,9 +41,49 @@ aerial_counter = 0
 ground_counter = 0
 
 
+def get_ground_image():
+    """
+    Captures a ground image using the images API.
+    """
+    ground_images_requests = [
+        airsim.ImageRequest("front_center", airsim.ImageType.Scene)
+    ]
+    ground_images = client.simGetImages(ground_images_requests, external=False)
+    save_images(ground_images, "ground")
+
+
+def get_aerial_image():
+    """
+    Captures an aerial image using the images API.
+    """
+    # Quick note: the pitch and the roll angles are fixed, will only need to change the yaw angle.
+    vehicle_pose = client.simGetVehiclePose()
+    vehicle_position = vehicle_pose.position
+    vehicle_orientation = vehicle_pose.orientation
+    new_yaw_angle = airsim.utils.to_eularian_angles(vehicle_orientation)[2]
+
+    client.simSetCameraPose(
+        "AerialCamera",
+        airsim.Pose(
+            airsim.Vector3r(
+                vehicle_position.x_val, vehicle_position.y_val, -40
+            ),  # Height of 10m base height + 30m
+            airsim.to_quaternion(
+                math.radians(-40), 0, new_yaw_angle
+            ),  # -90 (bottom down) + 50 angle pitch
+        ),
+        external=True,
+    )
+    aerial_images_requests = [
+        airsim.ImageRequest("AerialCamera", airsim.ImageType.Scene)
+    ]
+    aerial_images = client.simGetImages(aerial_images_requests, external=True)
+    save_images(aerial_images, "aerial")
+
+
 def save_images(responses, prefix):
-    """ "
-    Saves the image requests
+    """
+    Writes images to disk.
     """
     global aerial_counter
     global ground_counter
@@ -56,34 +96,16 @@ def save_images(responses, prefix):
             filename = os.path.join(tmp_dir, prefix + "_" + str(ground_counter))
             ground_counter += 1
 
-        print(
-            f"Type {response.image_type}, size {len(response.image_data_uint8)}, pos {response.camera_position}"
-        )
         airsim.write_file(
             os.path.normpath(filename + ".png"), response.image_data_uint8
         )
 
 
-ground_images_requests = [airsim.ImageRequest("front_center", airsim.ImageType.Scene)]
-ground_images = client.simGetImages(ground_images_requests, external=False)
-save_images(ground_images, "ground")
+try:
+    while True:
+        get_ground_image()
+        get_aerial_image()
+        time.sleep(1)
 
-vehicle_pose = client.simGetVehiclePose()
-vehicle_position = vehicle_pose.position
-vehicle_orientation = vehicle_pose.orientation
-
-# Quick note: the pitch and the roll angles are fixed, will only need to change the yaw angle.
-
-new_yaw_angle = airsim.utils.to_eularian_angles(vehicle_orientation)[2]
-
-client.simSetCameraPose(
-    "AerialCamera",
-    airsim.Pose(
-        airsim.Vector3r(vehicle_position.x_val, vehicle_position.y_val, -40),
-        airsim.to_quaternion(math.radians(AERIAL_PITCH_ANGLE), 0, new_yaw_angle),
-    ),
-    external=True,
-)
-aerial_images_requests = [airsim.ImageRequest("AerialCamera", airsim.ImageType.Scene)]
-aerial_images = client.simGetImages(aerial_images_requests, external=True)
-save_images(aerial_images, "aerial")
+except KeyboardInterrupt:
+    print("Program has terminated.")
