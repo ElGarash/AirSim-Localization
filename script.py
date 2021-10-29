@@ -8,6 +8,8 @@ import time
 class TrajectoryRecorder:
     aerial_counter = 0
     ground_counter = 0
+    current_position = airsim.Vector3r()
+    last_position = airsim.Vector3r()
     tmp_dir = os.path.join(tempfile.gettempdir(), "airsim_cv_mode")
 
     def __init__(self):
@@ -28,8 +30,7 @@ class TrajectoryRecorder:
         # Put the ground vehicle at a height of 1m.
         self.client.simSetVehiclePose(
             airsim.Pose(
-                airsim.Vector3r(initial_position.x_val,
-                                initial_position.y_val, -1),
+                airsim.Vector3r(initial_position.x_val, initial_position.y_val, -1),
                 initial_orientation,
             ),
             True,
@@ -51,8 +52,7 @@ class TrajectoryRecorder:
         ground_images_requests = [
             airsim.ImageRequest("front_center", airsim.ImageType.Scene)
         ]
-        ground_images = self.client.simGetImages(
-            ground_images_requests, external=False)
+        ground_images = self.client.simGetImages(ground_images_requests, external=False)
         self.save_images(ground_images, "ground")
 
     def save_images(self, responses, prefix):
@@ -65,11 +65,13 @@ class TrajectoryRecorder:
         for response in responses:
             if prefix == "aerial":
                 filename = os.path.join(
-                    self.tmp_dir, prefix + "_" + str(self.aerial_counter))
+                    self.tmp_dir, prefix + "_" + str(self.aerial_counter)
+                )
                 self.aerial_counter += 1
             else:
                 filename = os.path.join(
-                    self.tmp_dir, prefix + "_" + str(self.ground_counter))
+                    self.tmp_dir, prefix + "_" + str(self.ground_counter)
+                )
                 self.ground_counter += 1
 
             airsim.write_file(
@@ -101,21 +103,31 @@ class TrajectoryRecorder:
         aerial_images_requests = [
             airsim.ImageRequest("AerialCamera", airsim.ImageType.Scene)
         ]
-        aerial_images = self.client.simGetImages(
-            aerial_images_requests, external=True)
+        aerial_images = self.client.simGetImages(aerial_images_requests, external=True)
         self.save_images(aerial_images, "aerial")
 
-    def capture_images(self):
+    def capture_trajectory(self):
         try:
             while True:
-                self.get_ground_image()
-                self.get_aerial_image()
-                time.sleep(1)
+                self.current_position = self.client.simGetVehiclePose().position
+                # Capture images only if current position doesn't equal last position
+                if not self.current_eq_last():
+                    self.get_ground_image()
+                    self.get_aerial_image()
+                    self.last_position = self.client.simGetVehiclePose().position
+                    time.sleep(1)
 
         except KeyboardInterrupt:
-            print("Program has terminated.")
+            print("The program has been terminated.")
+
+    def current_eq_last(self):
+        return (
+            (self.current_position.x_val == self.last_position.x_val)
+            and (self.current_position.y_val == self.last_position.y_val)
+            and (self.current_position.z_val == self.last_position.z_val)
+        )
 
 
 if __name__ == "__main__":
     airsim_recorder = TrajectoryRecorder()
-    airsim_recorder.capture_images()
+    airsim_recorder.capture_trajectory()
