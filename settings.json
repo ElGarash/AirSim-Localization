@@ -1,6 +1,20 @@
 {
   "SettingsVersion": 1.2,
-  "SimMode": "ComputerVision",
+  "SimMode": "Multirotor",
+  "Vehicles": {
+    "AerialDrone": {
+      "VehicleType": "SimpleFlight",
+      "X": 2,
+      "Y": 0,
+      "Z": 0
+    },
+    "GroundDrone": {
+      "VehicleType": "SimpleFlight",
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  },
   "CameraDefaults": {
     "CaptureSettings": [
       {
@@ -9,17 +23,17 @@
       }
     ]
   },
-  "ExternalCameras": {
-    "AerialCamera": {
-      "X": 0.0,
-      "Y": 0.0,
-      "Z": 0.0,
-      "CaptureSettings": [
-        {
-          "Width": 2048,
-          "Height": 1024
-        }
-      ]
-    }
+  "Recording": {
+    "Cameras": [
+      {
+        "VehicleName": "AerialDrone",
+        "CameraName": "bottom_center"
+
+      },
+      {
+        "VehicleName": "GroundDrone",
+        "CameraName": "front_center"
+      }
+    ]
   }
 }
