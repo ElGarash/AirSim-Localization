@@ -8,28 +8,10 @@
       "Y": 0,
       "Z": 0
     },
-    "GroundDrone1": {
+    "GroundDrone": {
       "VehicleType": "SimpleFlight",
-      "X": -4,
-      "Y": -4,
-      "Z": 0
-    },
-    "GroundDrone2": {
-      "VehicleType": "SimpleFlight",
-      "X": -8,
-      "Y": -8,
-      "Z": 0
-    },
-    "GroundDrone3": {
-      "VehicleType": "SimpleFlight",
-      "X": -12,
-      "Y": -12,
-      "Z": 0
-    },
-    "GroundDrone4": {
-      "VehicleType": "SimpleFlight",
-      "X": -16,
-      "Y": -16,
+      "X": 1,
+      "Y": 0,
       "Z": 0
     }
   },
@@ -48,19 +30,7 @@
         "CameraName": "bottom_center"
       },
       {
-        "VehicleName": "GroundDrone1",
-        "CameraName": "front_center"
-      },
-      {
-        "VehicleName": "GroundDrone2",
-        "CameraName": "front_center"
-      },
-      {
-        "VehicleName": "GroundDrone3",
-        "CameraName": "front_center"
-      },
-      {
-        "VehicleName": "GroundDrone4",
+        "VehicleName": "GroundDrone",
         "CameraName": "front_center"
       }
     ]
