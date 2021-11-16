@@ -10,7 +10,7 @@
     },
     "GroundDrone": {
       "VehicleType": "SimpleFlight",
-      "X": 1,
+      "X": 2,
       "Y": 0,
       "Z": 0
     }

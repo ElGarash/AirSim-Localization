@@ -44,8 +44,13 @@ def initialize_drones(client):
     client.armDisarm(True, "GroundDrone")
 
     # Taking off
-    f1 = client.takeoffAsync("AerialDrone")
-    f2 = client.takeoffAsync("GroundDrone")
+    f1 = client.takeoffAsync(vehicle_name="AerialDrone")
+    f2 = client.takeoffAsync(vehicle_name="GroundDrone")
+    f1.join()
+    f2.join()
+
+    f1 = client.moveToZAsync(z=-40, velocity=5, vehicle_name='AerialDrone')
+    f2 = client.moveToZAsync(z=-1, velocity=5, vehicle_name='GroundDrone')
     f1.join()
     f2.join()
 
