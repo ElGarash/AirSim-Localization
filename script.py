@@ -7,10 +7,22 @@ PITCH_ANGLE = 50
 AERIAL_ALTITUDE = -40
 GROUND_ALTITUDE = -1
 
+
+def destroy_stationery_vehicles(client):
+    with open("vehicles.txt") as f:
+        vehicles = map(str.strip, f.readlines())
+        for vehicle in vehicles:
+            client.simDestroyObject(vehicle)
+
+
 if __name__ == "__main__":
     # Connect to the AirSim simulator
     client = airsim.MultirotorClient()
     client.confirmConnection()
+
+    destroy_stationery_vehicles(client)
+    # TODO: Add multiple ground drones
+    # TODO: Modify recording output to be in an easily readable form
 
     # Allow API Control
     client.enableApiControl(True, "AerialDrone")
