@@ -1,6 +1,7 @@
 import pandas
 import math
 import airsim
+import click
 
 
 def destroy_stationery_vehicles(client):
@@ -14,7 +15,7 @@ def destroy_stationery_vehicles(client):
             client.simDestroyObject(vehicle)
 
 
-def adjust_recording_parameters(client, aerial_pitch=50, ground_fov=120):
+def adjust_recording_parameters(client, aerial_pitch, ground_fov):
     """
     Customize recording parameters.
 
@@ -32,7 +33,7 @@ def adjust_recording_parameters(client, aerial_pitch=50, ground_fov=120):
     )
 
 
-def initialize_drones(client):
+def initialize_drones(client, aerial_altitude, ground_altitude):
     """
     Allow API control and taking off.
     """
@@ -49,19 +50,19 @@ def initialize_drones(client):
     f1.join()
     f2.join()
 
-    f1 = client.moveToZAsync(z=-40, velocity=5, vehicle_name='AerialDrone')
-    f2 = client.moveToZAsync(z=-1, velocity=5, vehicle_name='GroundDrone')
+    f1 = client.moveToZAsync(z=aerial_altitude, velocity=5, vehicle_name="AerialDrone")
+    f2 = client.moveToZAsync(z=ground_altitude, velocity=5, vehicle_name="GroundDrone")
     f1.join()
     f2.join()
 
     # Hovering (Not really sure what that means)
-    f1 = client.hoverAsync('AerialDrone')
-    f2 = client.hoverAsync('GroundDrone')
+    f1 = client.hoverAsync("AerialDrone")
+    f2 = client.hoverAsync("GroundDrone")
     f1.join()
-    f2.join()    
+    f2.join()
 
 
-def traverse_and_record_trajectory(client, aerial_altitude=-40, ground_altitude=-1):
+def traverse_and_record_trajectory(client, aerial_altitude, ground_altitude):
     # Read the trajectory trajectory_data into a list
     trajectory_data = pandas.read_csv("trajectory.csv").values.tolist()
 
@@ -96,12 +97,44 @@ def traverse_and_record_trajectory(client, aerial_altitude=-40, ground_altitude=
     client.reset()
 
 
-if __name__ == "__main__":
+@click.command()
+@click.option(
+    "--aerial_pitch",
+    default=50,
+    prompt="Aerial drone camera pitch",
+    help="Aerial drone camera pitch",
+)
+@click.option(
+    "--ground_fov",
+    default=120,
+    prompt="Ground drone camera FOV degrees",
+    help="Ground drone camera FOV degrees",
+)
+@click.option(
+    "--aerial_altitude",
+    default=40,
+    prompt="Aerial drone height",
+    help="Aerial drone height",
+)
+@click.option(
+    "--ground_altitude",
+    default=1,
+    prompt="Ground drone height",
+    help="Ground drone height",
+)
+def main(aerial_pitch, ground_fov, aerial_altitude, ground_altitude):
+    """
+    A script used to collect ground and aerial views for a scene using drones in AirSim.
+    """
     # Connect to the AirSim simulator
     client = airsim.MultirotorClient()
     client.confirmConnection()
 
     destroy_stationery_vehicles(client)
-    adjust_recording_parameters(client)
-    initialize_drones(client)
-    traverse_and_record_trajectory(client)
+    adjust_recording_parameters(client, aerial_pitch, ground_fov)
+    initialize_drones(client, -aerial_altitude, -ground_altitude)
+    traverse_and_record_trajectory(client, -aerial_altitude, -ground_altitude)
+
+
+if __name__ == "__main__":
+    main()
