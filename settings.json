@@ -1,6 +1,7 @@
 {
   "SettingsVersion": 1.2,
   "SimMode": "Multirotor",
+  "ViewMode": "NoDisplay",
   "Vehicles": {
     "AerialDrone": {
       "VehicleType": "SimpleFlight",

@@ -11,7 +11,7 @@ def write_csv_header(filename=FILE_NAME):
         writer.writeheader()
 
 
-def write_csv_row(client: airsim.CarClient, filename=FILE_NAME, time_delay=1):
+def write_csv_row(client: airsim.CarClient, filename=FILE_NAME, time_delay=0.8):
     """
     Collect X, Y coordinates every 1 second while moving in the environment.
     """
