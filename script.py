@@ -94,18 +94,22 @@ class TrajectoryRecorder:
         # Aerial drone
         f1 = self.client.moveOnPathAsync(
             aerial_path,
-            velocity=8,
+            velocity=7,
             drivetrain=airsim.DrivetrainType.ForwardOnly,
             yaw_mode=airsim.YawMode(False),
             vehicle_name="AerialDrone",
+            lookahead = -1,
+            adaptive_lookahead = 0
         )
         # Ground drone
         f2 = self.client.moveOnPathAsync(
             ground_path,
-            velocity=8,
+            velocity=7,
             drivetrain=airsim.DrivetrainType.ForwardOnly,
             yaw_mode=airsim.YawMode(False),
             vehicle_name="GroundDrone",
+            lookahead = -1,
+            adaptive_lookahead = 0
         )
         f1.join()
         f2.join()
