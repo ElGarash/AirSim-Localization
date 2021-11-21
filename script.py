@@ -5,7 +5,15 @@ import click
 
 
 class TrajectoryRecorder:
-    def __init__(self, aerial_pitch, ground_fov, aerial_altitude, ground_altitude, aerial_fov):
+    def __init__(
+        self,
+        aerial_pitch,
+        ground_fov,
+        aerial_altitude,
+        ground_altitude,
+        aerial_fov,
+        drone_velocity,
+    ):
         self.client = airsim.MultirotorClient()
         self.client.confirmConnection()
         self.aerial_pitch = aerial_pitch
@@ -13,6 +21,7 @@ class TrajectoryRecorder:
         self.aerial_fov = aerial_fov
         self.aerial_altitude = -aerial_altitude
         self.ground_altitude = -ground_altitude
+        self.drone_velocity = drone_velocity
 
     def destroy_stationery_vehicles(self):
         """
@@ -62,10 +71,14 @@ class TrajectoryRecorder:
         f2.join()
 
         f1 = self.client.moveToZAsync(
-            z=self.aerial_altitude, velocity=5, vehicle_name="AerialDrone"
+            z=self.aerial_altitude,
+            velocity=self.drone_velocity,
+            vehicle_name="AerialDrone",
         )
         f2 = self.client.moveToZAsync(
-            z=self.ground_altitude, velocity=5, vehicle_name="GroundDrone"
+            z=self.ground_altitude,
+            velocity=self.drone_velocity,
+            vehicle_name="GroundDrone",
         )
         f1.join()
         f2.join()
@@ -96,22 +109,22 @@ class TrajectoryRecorder:
         # Aerial drone
         f1 = self.client.moveOnPathAsync(
             aerial_path,
-            velocity=7,
+            velocity=self.drone_velocity,
             drivetrain=airsim.DrivetrainType.ForwardOnly,
             yaw_mode=airsim.YawMode(False),
             vehicle_name="AerialDrone",
-            lookahead = -1,
-            adaptive_lookahead = 0
+            lookahead=-1,
+            adaptive_lookahead=0,
         )
         # Ground drone
         f2 = self.client.moveOnPathAsync(
             ground_path,
-            velocity=7,
+            velocity=self.drone_velocity,
             drivetrain=airsim.DrivetrainType.ForwardOnly,
             yaw_mode=airsim.YawMode(False),
             vehicle_name="GroundDrone",
-            lookahead = -1,
-            adaptive_lookahead = 0
+            lookahead=-1,
+            adaptive_lookahead=0,
         )
         f1.join()
         f2.join()
@@ -152,14 +165,32 @@ class TrajectoryRecorder:
     prompt="Ground drone height",
     help="Ground drone height",
 )
-def main(aerial_pitch, ground_fov, aerial_altitude, ground_altitude, aerial_fov):
+@click.option(
+    "--drone_velocity",
+    default=7,
+    prompt="Drones'velocity",
+    help="Drones'velocity",
+)
+def main(
+    aerial_pitch,
+    ground_fov,
+    aerial_altitude,
+    ground_altitude,
+    aerial_fov,
+    drone_velocity,
+):
     """
     A script used to collect ground and aerial views for a scene using drones in AirSim.
     """
     # Connect to the AirSim simulator
 
     trajectory_recorder = TrajectoryRecorder(
-        aerial_pitch, ground_fov, aerial_altitude, ground_altitude, aerial_fov
+        aerial_pitch,
+        ground_fov,
+        aerial_altitude,
+        ground_altitude,
+        aerial_fov,
+        drone_velocity,
     )
 
     trajectory_recorder.destroy_stationery_vehicles()
