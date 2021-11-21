@@ -23,7 +23,7 @@ class TrajectoryRecorder:
         self.ground_altitude = -ground_altitude
         self.drone_velocity = drone_velocity
 
-    def destroy_stationery_vehicles(self):
+    def destroy_stationary_vehicles(self):
         """
         Remove stationary vehicles from the environments
         List of stationary vehicles objects exist in vehicles.txt
@@ -182,7 +182,6 @@ def main(
     """
     A script used to collect ground and aerial views for a scene using drones in AirSim.
     """
-    # Connect to the AirSim simulator
 
     trajectory_recorder = TrajectoryRecorder(
         aerial_pitch,
@@ -193,7 +192,7 @@ def main(
         drone_velocity,
     )
 
-    trajectory_recorder.destroy_stationery_vehicles()
+    trajectory_recorder.destroy_stationary_vehicles()
     trajectory_recorder.adjust_recording_parameters()
     trajectory_recorder.initialize_drones()
     trajectory_recorder.traverse_and_record_trajectory()
