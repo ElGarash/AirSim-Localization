@@ -5,11 +5,12 @@ import click
 
 
 class TrajectoryRecorder:
-    def __init__(self, aerial_pitch, ground_fov, aerial_altitude, ground_altitude):
+    def __init__(self, aerial_pitch, ground_fov, aerial_altitude, ground_altitude, aerial_fov):
         self.client = airsim.MultirotorClient()
         self.client.confirmConnection()
         self.aerial_pitch = aerial_pitch
         self.ground_fov = ground_fov
+        self.aerial_fov = aerial_fov
         self.aerial_altitude = -aerial_altitude
         self.ground_altitude = -ground_altitude
 
@@ -32,6 +33,7 @@ class TrajectoryRecorder:
         - ground_fov=120
         """
         self.client.simSetCameraFov("front_center", self.ground_fov, "GroundDrone")
+        self.client.simSetCameraFov("bottom_center", self.aerial_fov, "AerialDrone")
         self.client.simSetCameraPose(
             "bottom_center",
             airsim.Pose(
@@ -133,6 +135,12 @@ class TrajectoryRecorder:
     help="Ground drone camera FOV degrees",
 )
 @click.option(
+    "--aerial_fov",
+    default=90,
+    prompt="Aerial drone camera FOV degrees",
+    help="Aerial drone camera FOV degrees",
+)
+@click.option(
     "--aerial_altitude",
     default=40,
     prompt="Aerial drone height",
@@ -144,14 +152,14 @@ class TrajectoryRecorder:
     prompt="Ground drone height",
     help="Ground drone height",
 )
-def main(aerial_pitch, ground_fov, aerial_altitude, ground_altitude):
+def main(aerial_pitch, ground_fov, aerial_altitude, ground_altitude, aerial_fov):
     """
     A script used to collect ground and aerial views for a scene using drones in AirSim.
     """
     # Connect to the AirSim simulator
 
     trajectory_recorder = TrajectoryRecorder(
-        aerial_pitch, ground_fov, aerial_altitude, ground_altitude
+        aerial_pitch, ground_fov, aerial_altitude, ground_altitude, aerial_fov
     )
 
     trajectory_recorder.destroy_stationery_vehicles()
